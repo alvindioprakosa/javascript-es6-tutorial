@@ -1,6 +1,7 @@
-// untuk memahami promise kita mulai dengan sebuah contoh
-// kita akan melakukan pencarian data dari kumpilan objek
+// Untuk memahami promise, kita mulai dengan sebuah contoh
+// Kita akan melakukan pencarian data dari kumpulan objek
 
+// Fungsi sinkron untuk mengambil data pengguna
 function getUser() {
   return [
     { userName: "john", email: "johndoe@me.com" },
@@ -9,14 +10,18 @@ function getUser() {
   ];
 }
 
+// Fungsi untuk mencari pengguna dari data sinkron
 function findUser(userName) {
   const users = getUser();
   const user = users.find((user) => user.userName === userName);
   return user;
 }
 
-console.log(findUser("bob"));
+// Output untuk data sinkron
+console.log(findUser("bob")); // { userName: "bob", email: "bobdoe@me.com" }
 
+
+// Fungsi untuk mengambil data asinkron dengan setTimeout (Data kosong di awal)
 function getUser2() {
   let users = [];
   setTimeout(() => {
@@ -29,15 +34,18 @@ function getUser2() {
   return users;
 }
 
+// Fungsi untuk mencari pengguna dari data asinkron
 function findUser2(userName) {
   const users = getUser2();
   const user = users.find((user) => user.userName === userName);
   return user;
 }
 
-console.log(findUser2("bob"));
+// Output untuk data asinkron (ini akan menghasilkan undefined karena data belum ada)
+console.log(findUser2("bob")); // undefined
 
-// atasi dengan callback ES5
+
+// Atasi dengan callback (ES5)
 function getUser3(callback) {
   setTimeout(() => {
     callback([
@@ -48,6 +56,7 @@ function getUser3(callback) {
   }, 1000);
 }
 
+// Fungsi untuk mencari pengguna dengan callback
 function findUser3(userName, callback) {
   getUser3((users) => {
     const user = users.find((user) => user.userName === userName);
@@ -55,16 +64,17 @@ function findUser3(userName, callback) {
   });
 }
 
-findUser3("bob", (user) => console.log(user));
+// Output untuk data asinkron dengan callback
+findUser3("bob", (user) => console.log(user)); // { userName: "bob", email: "bobdoe@me.com" }
 
-// atasi dengan Promise ES6
-let sucess = true;
+
+// Atasi dengan Promise (ES6)
+let success = true;
 
 function getUser4() {
   return new Promise((resolve, reject) => {
-    // throw new Error("Field not found");
     setTimeout(() => {
-      if (sucess) {
+      if (success) {
         resolve([
           { userName: "john", email: "johndoe@me.com" },
           { userName: "jane", email: "janedoe@me.com" },
@@ -77,15 +87,18 @@ function getUser4() {
   });
 }
 
-function onFullField(users) {
+// Fungsi untuk menangani hasil jika Promise berhasil
+function onFulfilled(users) {
   const user = users.find((user) => user.userName === "bob");
-  console.log(user);
+  console.log(user); // { userName: "bob", email: "bobdoe@me.com" }
 }
 
+// Fungsi untuk menangani error jika Promise gagal
 function onReject(error) {
-  console.log(error);
+  console.log(error); // "Request failed" jika gagal
 }
 
+// Memanggil Promise
 const promise = getUser4();
-promise.then(onFullField, onReject);
+promise.then(onFulfilled, onReject);
 promise.catch(onReject);
