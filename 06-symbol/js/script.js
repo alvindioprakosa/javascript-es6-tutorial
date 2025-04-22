@@ -1,37 +1,30 @@
-// Symbol es6
-// symbol menciptakan nilai unik setiap dibuat
-// conoth membuat symbol
+// 1. Membuat Symbol
 let s = Symbol("foo");
+console.log("Symbol unik:", Symbol() === Symbol()); // false
 
-console.log(Symbol() === Symbol());
+// 2. Memberikan deskripsi ke Symbol
+let firstName = Symbol("firstName");
+let lastName = Symbol("lastName");
+console.log("First Name Symbol:", firstName);
+console.log("Last Name Symbol:", lastName);
+console.log("Tipe data:", typeof firstName); // symbol
 
-// sumbol menerima deskripsi walaupun sebagai argumen optional.
+// 3. Symbol tidak bisa dibuat dengan 'new'
+// let s2 = new Symbol(); // ❌ Error
 
-let firstName = Symbol("firstName"),
-  lastName = Symbol("lastName");
-console.log(firstName, lastName);
-
-console.log(typeof firstName);
-
-// symbol adalah nilai primitif jdi jika menggunakan new akan error
-// let s2 = new Symbol();
-
-// BERBAGI Symbol
-// BERBAGI SYMBOL KITA BISA MENGGUNAKAN FOR
+// 4. Berbagi Symbol menggunakan Symbol.for
 let ssn = Symbol.for("ssn");
 let citizenId = Symbol.for("ssn");
-console.log(ssn === citizenId);
+console.log("Shared Symbol:", ssn === citizenId); // true
 
-// untuk mendapatkan kunci yang terkait dengan suatu symbol gunakan keyFor
-console.log(Symbol.keyFor(ssn));
+// 5. Mendapatkan key dari Symbol yang terdaftar
+console.log("Key dari ssn:", Symbol.keyFor(ssn)); // "ssn"
 
-// jika symbol tidak ada dalam registry maka akan mengembalikan undefined
+// 6. Mendapatkan undefined untuk symbol lokal
+let localSym = Symbol("local");
+console.log("Key dari localSym:", Symbol.keyFor(localSym)); // undefined
 
-// console.log(Symbol.keyFor(systemId));
-
-// PENGGUNAAN SYMBOL
-// 1. menggunakan symbol sebagai nilai unik
-
+// 7. Menggunakan Symbol sebagai nilai unik
 let statuses = {
   OPEN: Symbol("open"),
   IN_PROGRESS: Symbol("in progress"),
@@ -42,42 +35,40 @@ let statuses = {
 
 let task = {
   setStatus(status) {
-    console.log(status);
+    console.log("Status ditetapkan:", status);
   },
 };
-
 task.setStatus(statuses.OPEN);
 
-// menggunakan symbol sebagai nama property
+// 8. Menggunakan Symbol sebagai property key
 let status = Symbol("status");
 task = {
   [status]: statuses.OPEN,
-  description: "Learn ES6 Symbols",
+  description: "Belajar ES6 Symbols",
 };
-console.log(task);
+console.log("Task dengan Symbol property:", task);
 
-// symbol iterator
-var numbers = [1, 2, 3];
-// untuk mengurainya kita bisa menggunakan for of
+// 9. Symbol.iterator secara default di array
+let numbers = [1, 2, 3];
+console.log("Iterasi dengan for...of:");
 for (let num of numbers) {
   console.log(num);
 }
 
-// secara internal sebenarnya javascript terlebih dahulu memanggil Symbol.iterator
+// 10. Manual menggunakan Symbol.iterator
+let iterator = numbers[Symbol.iterator]();
+console.log("Iterasi manual:");
+console.log(iterator.next()); // { value: 1, done: false }
+console.log(iterator.next()); // { value: 2, done: false }
+console.log(iterator.next()); // { value: 3, done: false }
+console.log(iterator.next()); // { value: undefined, done: true }
 
-var iterator = numbers[Symbol.iterator]();
-
-console.log(iterator.next());
-console.log(iterator.next());
-console.log(iterator.next());
-console.log(iterator.next());
-
-// Secara default, koleksi tidak dapat diubah. Namun, Anda dapat membuatnya dapat diubah dengan menggunakan seperti Symbol.iterator
-
+// 11. Custom iterable class dengan Symbol.iterator
 class List {
   constructor() {
     this.elements = [];
   }
+
   add(element) {
     this.elements.push(element);
     return this;
@@ -93,38 +84,29 @@ class List {
 let cars = new List();
 cars.add("BMW").add("Mercedes").add("Audi");
 
-for (let c of cars) {
-  console.log(c);
+console.log("Custom iterable class:");
+for (let car of cars) {
+  console.log(car);
 }
 
-// Metode Symbol.toPrimitive menentukan apa yang harus terjadi ketika suatu objek diubah menjadi nilai primitif.
-function Money(amount, currency) {
-  this.amount = amount;
-  this.currency = currency;
-}
-
+// 12. Symbol.toPrimitive: konversi objek ke primitif
 function Money(amount, currency) {
   this.amount = amount;
   this.currency = currency;
 }
 
 Money.prototype[Symbol.toPrimitive] = function (hint) {
-  var result;
   switch (hint) {
     case "string":
-      result = this.amount + this.currency;
-      break;
+      return `${this.amount}${this.currency}`;
     case "number":
-      result = this.amount;
-      break;
+      return this.amount;
     default:
-      result = this.amount + this.currency;
-      break;
+      return `${this.amount}${this.currency}`;
   }
-  return result;
 };
 
-var price = new Money(100, "USD");
-console.log("Price is: " + price);
-console.log(+price + 1);
-console.log(String(price));
+let price = new Money(100, "USD");
+console.log("toPrimitive string:", "Price is: " + price); // "Price is: 100USD"
+console.log("toPrimitive number:", +price + 1);           // 101
+console.log("toPrimitive String():", String(price));      // "100USD"
