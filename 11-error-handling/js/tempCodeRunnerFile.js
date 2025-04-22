@@ -1,7 +1,9 @@
 function getUserById2(id) {
   return new Promise((resolve, reject) => {
+    const authorized = false; // atau true
+
     if (!authorized) {
-      throw new Error("Unauthorized");
+      return reject(new Error("Unauthorized")); // Ganti throw jadi reject
     }
 
     resolve({
@@ -11,10 +13,6 @@ function getUserById2(id) {
   });
 }
 
-try {
-  getUserById2(10)
-    .then((user) => console.log(user.username))
-    .catch((err) => console.log(`Corror .catch : ${err}`));
-} catch (error) {
-  console.log(`Error by try/catch : ${error}`);
-}
+getUserById2(10)
+  .then((user) => console.log(user.username))
+  .catch((err) => console.log(`Error from .catch: ${err.message}`));
